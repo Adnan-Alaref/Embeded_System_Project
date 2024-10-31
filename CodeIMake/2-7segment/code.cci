@@ -1,0 +1,4 @@
+VERSION:3 SOURCE_TIMESTAMP:536AAE17
+NODE:I LEVEL:0 LINE:7 "C:\cvavreval\inc\delay.h"
+NODE:I LEVEL:0 LINE:8 "C:\cvavreval\inc\mega16.h"
+NODE:F LEVEL:0 LINE:10 "main(void)"

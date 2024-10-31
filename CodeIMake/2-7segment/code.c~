@@ -1,0 +1,24 @@
+/*
+ * 7_segment.c
+ *
+ * Created: 11/9/2021 10:41:11 PM
+ * Author: Abdo Gamal
+ */
+#include <delay.h>
+#include <mega16.h>
+
+void main(void)
+{
+  char
+   array[]={0x3F,0x06,0x5B,0x4F,0x66,0x6E,0xFE,0x87,0x7F,0x6F};
+   int i;
+   PORTA=0x00;
+   DDRA=0xFF;
+  while (1)
+  {
+  for( i=0;i<10;i++) {
+   PORTA = array[i]; /* write data on to the LED port */
+    delay_ms(100); /* wait for 1 second */
+   }
+     }
+}

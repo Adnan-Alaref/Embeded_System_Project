@@ -1,0 +1,110 @@
+/*
+ * CCProj.c
+ *
+ * Created: 14/11/2018 1:44:43 PM
+ * Author: Lost Heaven
+ */
+
+#include <mega16.h>
+#include <alcd.h>
+#include <delay.h>
+
+#define bit_set(r,b) r|=(1<<b)
+#define bit_clr(r,b) r &= !(1<<b)
+
+
+unsigned char secs=0,mins=0,hours=0;
+unsigned char operation = 0;
+
+void EE_Write(unsigned int address,unsigned char data);
+unsigned char EE_Read(unsigned int address);
+
+void main(void)
+{
+DDRB.0=0;
+PORTB.0=1;
+
+DDRD.2=0;
+PORTD.2=1;
+
+lcd_init(16);
+//-----INT0 configuration
+bit_set(MCUCR,1);         //Falling edge for external interrupt0
+bit_set(GICR,6);
+#asm("sei")
+
+
+while (1)
+    {
+    
+                lcd_clear();
+            lcd_puts("Press start!");
+
+/*      if (operation == 0)
+         {
+            lcd_clear();
+            lcd_puts("Press start!");
+         }
+       else
+       {
+         lcd_clear();
+         lcd_printf("Cars passed=%u",TCNT0);
+         lcd_gotoxy(0,1);
+         lcd_printf("Mins=%u Secs=%u",mins,secs);
+       }
+       */
+    }
+
+}
+
+interrupt [2] void ext_int0 (void)
+{
+  operation = 1;  
+  TCCR0= 0b00000110;
+  TCCR2= 0b00000101;
+  bit_set(ASSR,3);
+  bit_set(TIMSK,6);
+  
+}
+
+interrupt [5] void T2_OV (void)
+{
+  secs++;
+  if (secs == 60)
+     {
+       secs = 0;
+       mins++;
+     }
+  if (mins == 60)
+     {
+       mins = 0;
+       hours++;
+       TCCR0=0;
+       TCCR2=0;
+       lcd_clear();
+       lcd_printf("Total Cars=%u",TCNT0);
+       delay_ms(20000);
+       EE_Write(hours,TCNT0);
+       TCNT0=0;
+       operation = 0;
+       
+     } 
+}
+
+
+void EE_Write(unsigned int address,unsigned char data)
+{
+ while(EECR.1 == 1);
+ EEAR = address;
+ EEDR = data;
+ EECR.2=1;
+ EECR.1=1;
+}
+
+unsigned char EE_Read(unsigned int address)
+{
+ while(EECR.1 == 1);
+ EEAR = address;
+ EECR.0 = 1;
+ return EEDR;
+}
